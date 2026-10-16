@@ -6,11 +6,14 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
+use App\Models\Role;
+use Database\Seeders\RoleSeeder;
 
 class AuthTest extends TestCase
 {
     use RefreshDatabase;
 
+    //
     public function test_authenticated_user_can_retrieve_their_profile(): void
     {
         $user = User::factory()->create();
@@ -27,8 +30,11 @@ class AuthTest extends TestCase
             ->assertJsonMissingPath('password');
     }
 
+    //register
     public function test_user_can_register(): void
     {
+        $this->seed(RoleSeeder::class);
+
         $response = $this->withHeader(
             'Origin',
             'http://127.0.0.1:3000'
@@ -49,6 +55,10 @@ class AuthTest extends TestCase
         ]);
 
         $user = User::where('email', 'test@example.com')->firstOrFail();
+
+        $this->assertTrue(
+            $user->roles()->where('slug', 'customer')->exists()
+        );
 
         $this->assertTrue(
             Hash::check('StrongPass123!', $user->password)
@@ -75,6 +85,34 @@ class AuthTest extends TestCase
             ]);
 
         $this->assertDatabaseCount('users', 0);
+    }
+
+    public function test_registration_cannot_assign_admin_role(): void
+    {
+        $this->seed(RoleSeeder::class);
+
+        $response = $this->withHeader(
+            'Origin',
+            'http://127.0.0.1:3000'
+        )->postJson('/api/register', [
+            'name' => 'Regular User',
+            'email' => 'regular@example.com',
+            'password' => 'StrongPass123!',
+            'password_confirmation' => 'StrongPass123!',
+            'role' => 'admin',
+        ]);
+
+        $response->assertCreated();
+
+        $user = User::where('email', 'regular@example.com')->firstOrFail();
+
+        $this->assertTrue(
+            $user->roles()->where('slug', 'customer')->exists()
+        );
+
+        $this->assertFalse(
+            $user->roles()->where('slug', 'admin')->exists()
+        );
     }
 
     //login
