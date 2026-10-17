@@ -183,4 +183,19 @@ class AuthTest extends TestCase
 
         $response->assertUnauthorized();
     }
+
+    //
+    public function test_user_can_be_checked_for_a_role(): void
+    {
+        $this->seed(RoleSeeder::class);
+
+        $user = User::factory()->create();
+
+        $customerRole = Role::where('slug', 'customer')->firstOrFail();
+
+        $user->roles()->attach($customerRole->id);
+
+        $this->assertTrue($user->hasRole('customer'));
+        $this->assertFalse($user->hasRole('admin'));
+    }
 }
