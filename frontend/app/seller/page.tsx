@@ -194,6 +194,13 @@ export default function SellerDashboardPage() {
                                         {actionError}
                                     </p>
                                 )}
+
+                                <Link
+                                    href={`/seller/stores/${store.id}/products`}
+                                    className="inline-flex rounded-md border px-4 py-2 text-sm font-medium"
+                                >
+                                    Manage products
+                                </Link>
                             </article>
                         ))}
                     </div>
