@@ -13,6 +13,21 @@ class StorePolicy
             || $user->hasRole('admin');
     }
 
+    public function viewAny(User $user): bool
+    {
+        return $user->hasRole('seller')
+            || $user->hasRole('admin');
+    }
+
+    public function view(User $user, Store $store): bool
+    {
+        return $user->hasRole('admin')
+            || (
+                $user->hasRole('seller')
+                && $user->id === $store->user_id
+            );
+    }
+
     public function update(User $user, Store $store): bool
     {
         return $user->hasRole('admin')
