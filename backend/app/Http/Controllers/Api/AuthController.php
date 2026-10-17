@@ -47,7 +47,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Account created successfully.',
-            'user' => $user,
+            'user' => $request->user()->load('roles'),
         ], 201);
     }
 
@@ -70,7 +70,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logged in successfully.',
-            'user' => $request->user(),
+            'user' => $request->user()->load('roles'),
         ]);
     }
 

@@ -4,9 +4,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\StoreController;
+use App\Http\Controllers\Api\SellerOnboardingController;
 
 Route::get('/user', function (Request $request) {
-    return $request->user();
+    return $request->user()->load('roles');
 })->middleware('auth:sanctum');
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -23,4 +24,7 @@ Route::get('/stores/{store}', [StoreController::class, 'show'])
 Route::patch('/stores/{store}', [StoreController::class, 'update'])
     ->middleware('auth:sanctum');
 Route::delete('/stores/{store}', [StoreController::class, 'destroy'])
+    ->middleware('auth:sanctum');
+
+Route::post('/seller-onboarding', [SellerOnboardingController::class, 'store'])
     ->middleware('auth:sanctum');

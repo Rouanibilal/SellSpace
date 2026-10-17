@@ -6,10 +6,12 @@ import { useState } from 'react';
 import { useAuth } from '@/components/auth-provider';
 
 export default function Home() {
-    const { user, isLoading, error, signOut } = useAuth();
+    const { user, isLoading, error, signOut, becomeSeller } = useAuth();
 
     const [isSigningOut, setIsSigningOut] = useState(false);
     const [logoutError, setLogoutError] = useState<string | null>(null);
+    const [isBecomingSeller, setIsBecomingSeller] = useState(false);
+    const [onboardingError, setOnboardingError] = useState<string | null>(null);
 
     async function handleSignOut() {
         setIsSigningOut(true);
@@ -21,6 +23,19 @@ export default function Home() {
             setLogoutError('Unable to log out. Please try again.');
         } finally {
             setIsSigningOut(false);
+        }
+    }
+
+    async function handleBecomeSeller() {
+        setIsBecomingSeller(true);
+        setOnboardingError(null);
+
+        try {
+            await becomeSeller();
+        } catch {
+            setOnboardingError('Unable to become a seller. Please try again.');
+        } finally {
+            setIsBecomingSeller(false);
         }
     }
 
@@ -45,6 +60,38 @@ export default function Home() {
                         </h2>
 
                         <p className="text-gray-600">{user.email}</p>
+
+                        {user.roles.some((role) => role.slug === 'customer') &&
+                            !user.roles.some((role) => role.slug === 'seller') && (
+                                <div className="space-y-3">
+                                    <p className="text-gray-600">
+                                        Want to sell on SellSpace?
+                                    </p>
+
+                                    <button
+                                        type="button"
+                                        onClick={handleBecomeSeller}
+                                        disabled={isBecomingSeller}
+                                        className="rounded-md bg-black px-5 py-2 text-white disabled:opacity-60"
+                                    >
+                                        {isBecomingSeller
+                                            ? 'Setting up seller access...'
+                                            : 'Become a seller'}
+                                    </button>
+                                </div>
+                            )}
+
+                        {user.roles.some((role) => role.slug === 'seller') && (
+                            <p className="text-sm text-green-700">
+                                Seller access enabled.
+                            </p>
+                        )}
+
+                        {onboardingError && (
+                            <p role="alert" className="text-sm text-red-600">
+                                {onboardingError}
+                            </p>
+                        )}
 
                         <button
                             type="button"

@@ -14,6 +14,7 @@ import {
     getCurrentUser,
     login,
     logout,
+    onboardAsSeller,
     register,
     type LoginData,
     type RegisterData,
@@ -28,6 +29,7 @@ type AuthContextValue = {
     signIn: (data: LoginData) => Promise<User>;
     signOut: () => Promise<void>;
     refreshUser: () => Promise<User | null>;
+    becomeSeller: () => Promise<User>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -92,6 +94,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
     }, []);
 
+    async function becomeSeller(): Promise<User> {
+        setError(null);
+
+        try {
+            const updatedUser = await onboardAsSeller();
+            setUser(updatedUser);
+            return updatedUser;
+        } catch {
+            setError('Unable to become a seller. Please try again.');
+            throw new Error('Seller onboarding failed.');
+        }
+    }
+
     async function signUp(data: RegisterData): Promise<User> {
         setError(null);
 
@@ -145,6 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 signIn,
                 signOut,
                 refreshUser,
+                becomeSeller,
             }}
         >
             {children}
