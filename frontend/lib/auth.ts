@@ -1,5 +1,12 @@
 import { api, initializeCsrf } from './api';
 
+export type Role = {
+    id: number;
+    name: string;
+    slug: string;
+    description: string | null;
+};
+
 export type User = {
     id: number;
     name: string;
@@ -7,6 +14,7 @@ export type User = {
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
+    roles: Role[];
 };
 
 type AuthResponse = {
@@ -50,4 +58,12 @@ export async function getCurrentUser(): Promise<User> {
     const response = await api.get<User>('/user');
 
     return response.data;
+}
+
+export async function onboardAsSeller(): Promise<User> {
+    await initializeCsrf();
+
+    const response = await api.post<AuthResponse>('/seller-onboarding');
+
+    return response.data.user;
 }
