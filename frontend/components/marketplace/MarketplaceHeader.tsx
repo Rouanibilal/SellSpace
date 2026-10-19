@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from 'react';
 import Link from 'next/link';
 
+import { useTheme } from '@/components/theme-provider';
 import type { User } from '@/lib/auth';
 
 import {
@@ -65,6 +66,34 @@ function HeartIcon() {
     );
 }
 
+function ThemeIcon({ isDark }: { isDark: boolean }) {
+    return (
+        <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="size-5"
+        >
+            {isDark ? (
+                <path
+                    d="M12 3v2m0 14v2M3 12h2m14 0h2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42m0-12.72-1.42 1.42m-9.88 9.88-1.42 1.42M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                />
+            ) : (
+                <path
+                    d="M20.9 13A8.5 8.5 0 0 1 11 3.1 8.5 8.5 0 1 0 20.9 13Z"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                />
+            )}
+        </svg>
+    );
+}
+
 export default function MarketplaceHeader({
                                               categories,
                                               selectedCategory,
@@ -78,6 +107,9 @@ export default function MarketplaceHeader({
                                               isSigningOut,
                                               onSignOut,
                                           }: Props) {
+    const { theme, toggleTheme } = useTheme();
+    const isDark = theme === 'dark';
+
     const cartSnapshot = useSyncExternalStore(
         subscribeToCart,
         getCartSnapshot,
@@ -173,6 +205,24 @@ export default function MarketplaceHeader({
                         >
                             Stores
                         </Link>
+
+                        <button
+                            type="button"
+                            onClick={toggleTheme}
+                            aria-label={
+                                isDark
+                                    ? 'Switch to light mode'
+                                    : 'Switch to dark mode'
+                            }
+                            title={
+                                isDark
+                                    ? 'Switch to light mode'
+                                    : 'Switch to dark mode'
+                            }
+                            className="inline-flex size-10 items-center justify-center rounded-lg border border-border text-foreground transition hover:border-accent hover:bg-surface-muted hover:text-accent"
+                        >
+                            <ThemeIcon isDark={isDark} />
+                        </button>
 
                         <Link
                             href="/wishlist"
