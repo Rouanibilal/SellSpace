@@ -1,0 +1,122 @@
+import type { MarketplaceOrder } from '@/types/orders';
+
+export const mockOrders: MarketplaceOrder[] = [
+    {
+        id: 'order-demo-001',
+        orderNumber: 'SS-2026-1042',
+        createdAt: '2026-10-12T10:30:00.000Z',
+        status: 'delivered',
+        paymentStatus: 'paid',
+        paymentMethod: 'card',
+        deliveryMethod: 'standard',
+        items: [
+            {
+                productId: 'product-001',
+                productSlug: 'studio-wireless-headphones',
+                productName: 'Studio Wireless Headphones',
+                productImageUrl:
+                    'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=85',
+                storeName: 'Loop Audio',
+                storeSlug: 'loop-audio',
+                unitPrice: 649,
+                quantity: 1,
+            },
+            {
+                productId: 'product-002',
+                productSlug: 'sculptural-table-lamp',
+                productName: 'Sculptural Table Lamp',
+                productImageUrl:
+                    'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=85',
+                storeName: 'Casa Objects',
+                storeSlug: 'casa-objects',
+                unitPrice: 420,
+                quantity: 1,
+            },
+        ],
+        subtotal: 1069,
+        shipping: 35,
+        total: 1104,
+        deliveryAddress: {
+            fullName: 'Yasmine Example',
+            phone: '+212 600 000 001',
+            address: '12 Avenue des Fleurs',
+            city: 'Casablanca',
+            postalCode: '20000',
+        },
+    },
+    {
+        id: 'order-demo-002',
+        orderNumber: 'SS-2026-1048',
+        createdAt: '2026-10-17T14:15:00.000Z',
+        status: 'shipped',
+        paymentStatus: 'paid',
+        paymentMethod: 'card',
+        deliveryMethod: 'express',
+        items: [
+            {
+                productId: 'product-003',
+                productSlug: 'everyday-leather-tote',
+                productName: 'Everyday Leather Tote',
+                productImageUrl:
+                    'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=85',
+                storeName: 'Atelier Noor',
+                storeSlug: 'atelier-noor',
+                unitPrice: 390,
+                quantity: 1,
+            },
+            {
+                productId: 'product-005',
+                productSlug: 'retro-runner-sneakers',
+                productName: 'Retro Runner Sneakers',
+                productImageUrl:
+                    'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=85',
+                storeName: 'Street Form',
+                storeSlug: 'street-form',
+                unitPrice: 560,
+                quantity: 1,
+            },
+        ],
+        subtotal: 950,
+        shipping: 60,
+        total: 1010,
+        deliveryAddress: {
+            fullName: 'Yasmine Example',
+            phone: '+212 600 000 001',
+            address: '12 Avenue des Fleurs',
+            city: 'Casablanca',
+            postalCode: '20000',
+        },
+    },
+    {
+        id: 'order-demo-003',
+        orderNumber: 'SS-2026-1051',
+        createdAt: '2026-10-19T09:00:00.000Z',
+        status: 'pending',
+        paymentStatus: 'pending',
+        paymentMethod: 'cash_on_delivery',
+        deliveryMethod: 'standard',
+        items: [
+            {
+                productId: 'product-011',
+                productSlug: 'portable-bluetooth-speaker',
+                productName: 'Portable Bluetooth Speaker',
+                productImageUrl:
+                    'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=900&q=85',
+                storeName: 'Loop Audio',
+                storeSlug: 'loop-audio',
+                unitPrice: 450,
+                quantity: 1,
+            },
+        ],
+        subtotal: 450,
+        shipping: 35,
+        total: 485,
+        deliveryAddress: {
+            fullName: 'Yasmine Example',
+            phone: '+212 600 000 001',
+            address: '12 Avenue des Fleurs',
+            city: 'Casablanca',
+            postalCode: '20000',
+        },
+    },
+];
