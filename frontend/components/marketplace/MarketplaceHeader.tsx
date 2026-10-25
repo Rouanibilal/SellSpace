@@ -12,6 +12,8 @@ import {
     subscribeToCart,
 } from '@/lib/cart';
 
+import { useSiteSettings } from '@/components/site-settings-provider';
+
 type Props = {
     categories: string[];
     selectedCategory: string;
@@ -66,6 +68,106 @@ function HeartIcon() {
     );
 }
 
+function MarketplaceIcon() {
+    return (
+        <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="size-5"
+        >
+            <path
+                d="M3 10v10h18V10M2.5 9l2-6h15l2 6"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <path
+                d="M2.5 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M9 20v-6h6v6"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    );
+}
+
+function AccountIcon() {
+    return (
+        <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="size-5 shrink-0"
+        >
+            <circle
+                cx="12"
+                cy="8"
+                r="4"
+                stroke="currentColor"
+                strokeWidth="1.7"
+            />
+            <path
+                d="M4 21a8 8 0 0 1 16 0"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    );
+}
+
+function DashboardIcon() {
+    return (
+        <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="size-5 shrink-0"
+        >
+            <rect
+                x="3"
+                y="3"
+                width="7"
+                height="7"
+                rx="1.5"
+                stroke="currentColor"
+                strokeWidth="1.7"
+            />
+            <rect
+                x="14"
+                y="3"
+                width="7"
+                height="7"
+                rx="1.5"
+                stroke="currentColor"
+                strokeWidth="1.7"
+            />
+            <rect
+                x="3"
+                y="14"
+                width="7"
+                height="7"
+                rx="1.5"
+                stroke="currentColor"
+                strokeWidth="1.7"
+            />
+            <rect
+                x="14"
+                y="14"
+                width="7"
+                height="7"
+                rx="1.5"
+                stroke="currentColor"
+                strokeWidth="1.7"
+            />
+        </svg>
+    );
+}
+
 function ThemeIcon({ isDark }: { isDark: boolean }) {
     return (
         <svg
@@ -95,9 +197,6 @@ function ThemeIcon({ isDark }: { isDark: boolean }) {
 }
 
 export default function MarketplaceHeader({
-                                              categories,
-                                              selectedCategory,
-                                              onSelectCategory,
                                               search,
                                               onSearchChange,
                                               onBrowseProducts,
@@ -109,6 +208,8 @@ export default function MarketplaceHeader({
                                           }: Props) {
     const { theme, toggleTheme } = useTheme();
     const isDark = theme === 'dark';
+
+    const settings = useSiteSettings();
 
     const cartSnapshot = useSyncExternalStore(
         subscribeToCart,
@@ -123,27 +224,36 @@ export default function MarketplaceHeader({
 
     return (
         <header className="sticky top-0 z-50 border-b border-border bg-background">
-            <div className="bg-accent px-4 py-2 text-center text-xs font-medium text-white sm:text-sm">
-                Discover independent stores. Find something you love.
-            </div>
+
+            {settings.announcement_enabled && (
+                <div className="bg-accent px-4 py-2 text-center text-xs font-medium text-white sm:text-sm">
+                    {settings.announcement_text}
+                </div>
+            )}
 
             <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-                <div className="flex min-h-[76px] flex-wrap items-center gap-4 py-4 lg:flex-nowrap">
+                <div className="flex min-h-[76px] flex-wrap items-center gap-3 py-4 lg:flex-nowrap lg:gap-5">
                     <Link
                         href="/"
                         aria-label="SellSpace home"
                         className="shrink-0 text-2xl font-bold tracking-[-0.07em] text-foreground sm:text-3xl"
                     >
-                        sellspace<span className="text-accent">.</span>
+                        {settings.brand_name_enabled && (
+                            <>
+                                {settings.brand_name}
+                                <span className="text-accent">.</span>
+                            </>
+                        )}
                     </Link>
 
+                    {/* Search */}
                     <form
                         role="search"
-                        className="order-3 flex w-full items-center gap-3 rounded-xl border border-border bg-surface px-4 transition focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/10 lg:order-none lg:ml-6 lg:max-w-xl"
                         onSubmit={(event) => {
                             event.preventDefault();
                             onBrowseProducts();
                         }}
+                        className="order-3 flex w-full min-w-0 items-center gap-3 rounded-xl border border-border bg-surface px-4 transition focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/10 lg:order-none lg:ml-4 lg:w-auto lg:flex-1 lg:max-w-[520px]"
                     >
                         <svg
                             aria-hidden="true"
@@ -188,42 +298,11 @@ export default function MarketplaceHeader({
                         )}
                     </form>
 
+                    {/* Wishlist and cart */}
                     <nav
-                        aria-label="Main navigation"
-                        className="ml-auto flex items-center gap-2 sm:gap-3 lg:gap-4"
+                        aria-label="Shopping actions"
+                        className="flex shrink-0 items-center gap-2 sm:gap-3"
                     >
-                        <Link
-                            href="/marketplace"
-                            className="hidden whitespace-nowrap text-sm font-medium text-muted-foreground transition hover:text-accent sm:inline-flex"
-                        >
-                            Shop
-                        </Link>
-
-                        <Link
-                            href="/stores"
-                            className="hidden whitespace-nowrap text-sm font-medium text-muted-foreground transition hover:text-accent md:inline-flex"
-                        >
-                            Stores
-                        </Link>
-
-                        <button
-                            type="button"
-                            onClick={toggleTheme}
-                            aria-label={
-                                isDark
-                                    ? 'Switch to light mode'
-                                    : 'Switch to dark mode'
-                            }
-                            title={
-                                isDark
-                                    ? 'Switch to light mode'
-                                    : 'Switch to dark mode'
-                            }
-                            className="inline-flex size-10 items-center justify-center rounded-lg border border-border text-foreground transition hover:border-accent hover:bg-surface-muted hover:text-accent"
-                        >
-                            <ThemeIcon isDark={isDark} />
-                        </button>
-
                         <Link
                             href="/wishlist"
                             aria-label="Wishlist"
@@ -239,7 +318,7 @@ export default function MarketplaceHeader({
                                 cartQuantity === 1 ? 'item' : 'items'
                             }`}
                             title={`Shopping cart (${cartQuantity})`}
-                            className="relative inline-flex size-10 items-center justify-center rounded-lg border border-border transition hover:border-accent hover:bg-surface-muted"
+                            className="relative inline-flex size-10 items-center justify-center rounded-lg border border-border transition hover:border-accent hover:bg-surface-muted hover:text-accent"
                         >
                             <CartIcon />
 
@@ -252,6 +331,40 @@ export default function MarketplaceHeader({
                                 </span>
                             )}
                         </Link>
+                    </nav>
+
+                    {/* Marketplace: icon only */}
+                    <Link
+                        href="/marketplace"
+                        aria-label="Marketplace"
+                        title="Marketplace"
+                        className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg border border-border text-foreground transition hover:border-accent hover:bg-surface-muted hover:text-accent lg:ml-auto"
+                    >
+                        <MarketplaceIcon />
+                    </Link>
+
+                    {/* Theme and account actions */}
+                    <nav
+                        aria-label="Main navigation"
+                        className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3 lg:gap-4"
+                    >
+                        <button
+                            type="button"
+                            onClick={toggleTheme}
+                            aria-label={
+                                isDark
+                                    ? 'Switch to light mode'
+                                    : 'Switch to dark mode'
+                            }
+                            title={
+                                isDark
+                                    ? 'Switch to light mode'
+                                    : 'Switch to dark mode'
+                            }
+                            className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg border border-border text-foreground transition hover:border-accent hover:bg-surface-muted hover:text-accent"
+                        >
+                            <ThemeIcon isDark={isDark} />
+                        </button>
 
                         {isLoading ? (
                             <span
@@ -260,26 +373,25 @@ export default function MarketplaceHeader({
                             />
                         ) : user ? (
                             <>
+                                {/* Account: icon + label */}
                                 <Link
                                     href="/account"
-                                    className="hidden whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium text-foreground transition hover:text-accent sm:inline-flex"
+                                    className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg border border-border px-3 py-2.5 text-sm font-medium text-foreground transition hover:border-accent hover:bg-surface-muted hover:text-accent sm:px-4"
                                 >
-                                    My account
+                                    <AccountIcon />
+                                    <span>Account</span>
                                 </Link>
 
-                                <Link
-                                    href="/account/orders"
-                                    className="hidden whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium text-muted-foreground transition hover:text-accent lg:inline-flex"
-                                >
-                                    Orders
-                                </Link>
-
+                                {/* Dashboard button with icon */}
                                 {isSeller && (
                                     <Link
                                         href="/seller"
-                                        className="hidden whitespace-nowrap text-sm font-medium text-muted-foreground transition hover:text-accent xl:inline-flex"
+                                        aria-label="Seller dashboard"
+                                        title="Seller dashboard"
+                                        className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg border border-border px-3 py-2.5 text-sm font-medium text-foreground transition hover:border-accent hover:bg-surface-muted hover:text-accent sm:px-4"
                                     >
-                                        Seller dashboard
+                                        <DashboardIcon />
+                                        <span>Dashboard</span>
                                     </Link>
                                 )}
 
@@ -311,34 +423,6 @@ export default function MarketplaceHeader({
                                 </Link>
                             </>
                         )}
-                    </nav>
-                </div>
-
-                <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-                    <nav
-                        aria-label="Shop by category"
-                        className="flex min-w-max items-center gap-6 sm:gap-8"
-                    >
-                        {categories.map((category) => {
-                            const isSelected =
-                                selectedCategory === category;
-
-                            return (
-                                <button
-                                    key={category}
-                                    type="button"
-                                    aria-pressed={isSelected}
-                                    onClick={() => onSelectCategory(category)}
-                                    className={`border-b-2 py-3 text-sm transition ${
-                                        isSelected
-                                            ? 'border-accent font-semibold text-accent'
-                                            : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
-                                    }`}
-                                >
-                                    {category}
-                                </button>
-                            );
-                        })}
                     </nav>
                 </div>
             </div>
