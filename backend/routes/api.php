@@ -2,11 +2,15 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\SiteSettingController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\SellerOnboardingController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CategoryController;
+
+// Public endpoint for retrieving site settings.
+Route::get('/settings', [SiteSettingController::class, 'index']);
 
 Route::get('/user', function (Request $request) {
     return $request->user()->load('roles');
