@@ -481,6 +481,9 @@ function AccountActions({
 /* -------------------------------------------------------------------------- */
 
 type Props = {
+    categories?: string[];
+    selectedCategory?: string;
+    onSelectCategory?: (category: string) => void;
     search: string;
     onSearchChange: (value: string) => void;
     onBrowseProducts: () => void;
