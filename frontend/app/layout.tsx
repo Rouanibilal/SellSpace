@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
+import { connection } from 'next/server';
 import Script from 'next/script';
 import { Inter } from 'next/font/google';
 
 import { AuthProvider } from '@/components/auth-provider';
 import { ThemeProvider } from '@/components/theme-provider';
 import { SiteSettingsProvider } from '@/components/site-settings-provider';
+import { getInitialUser } from '@/lib/auth-server';
 import { getSiteSettings, type SiteSettings } from '@/lib/settings';
+import type { User } from '@/lib/auth';
 
 import './globals.css';
 
@@ -42,13 +45,29 @@ const themeInitScript = `
   }
 `;
 
-export default async function RootLayout({children,}: LayoutProps<'/'>) {
+export default async function RootLayout({ children }: LayoutProps<'/'>) {
+    // The layout reads cookies, so every route renders per request.
+    // Declaring that here keeps Next's dynamic-rendering signal out of the
+    // try/catch blocks below.
+    await connection();
+
     let settings: SiteSettings;
     try {
         settings = await getSiteSettings();
     } catch (error) {
         console.error('Failed to load site settings:', error);
         settings = defaultSettings;
+    }
+
+    let initialUser: User | null | undefined;
+
+    try {
+        initialUser = await getInitialUser();
+    } catch (error) {
+        console.error('Failed to verify the initial user session:', error);
+
+        // Fall back to the existing browser-side session check.
+        initialUser = undefined;
     }
 
     return (
@@ -64,11 +83,9 @@ export default async function RootLayout({children,}: LayoutProps<'/'>) {
         </head>
 
         <body className="flex min-h-full flex-col font-sans">
-        <AuthProvider>
+        <AuthProvider initialUser={initialUser}>
             <ThemeProvider>
-                <SiteSettingsProvider
-                    initialSettings={settings}
-                >
+                <SiteSettingsProvider initialSettings={settings}>
                     {children}
                 </SiteSettingsProvider>
             </ThemeProvider>

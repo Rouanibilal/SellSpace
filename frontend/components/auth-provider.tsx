@@ -1,6 +1,6 @@
 'use client';
 
-import axios, { isAxiosError } from 'axios';
+import { isAxiosError } from 'axios';
 import {
     createContext,
     useCallback,
@@ -32,11 +32,16 @@ type AuthContextValue = {
     becomeSeller: () => Promise<User>;
 };
 
+type AuthProviderProps = {
+    children: ReactNode;
+    initialUser?: User | null;
+};
+
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+export function AuthProvider({ children, initialUser }: AuthProviderProps) {
+    const [user, setUser] = useState<User | null>(initialUser ?? null);
+    const [isLoading, setIsLoading] = useState(initialUser === undefined);
     const [error, setError] = useState<string | null>(null);
 
     const refreshUser = useCallback(async (): Promise<User | null> => {
@@ -55,12 +60,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 return null;
             }
 
-            setError('Unable to verify your session. Check that Laravel is running.');
+            setError(
+                'Unable to verify your session. Check that Laravel is running.',
+            );
             throw err;
         }
     }, []);
 
     useEffect(() => {
+        // The server already resolved the session, so there is nothing to fetch.
+        if (initialUser !== undefined) {
+            return;
+        }
+
         let active = true;
 
         getCurrentUser()
@@ -92,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return () => {
             active = false;
         };
-    }, []);
+    }, [initialUser]);
 
     async function becomeSeller(): Promise<User> {
         setError(null);
@@ -134,17 +146,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     async function signOut(): Promise<void> {
+        const previousUser = user;
+
+        // Hide authenticated controls immediately.
+        setUser(null);
+        setError(null);
+
         try {
             await logout();
-            setUser(null);
-            setError(null);
         } catch (err: unknown) {
-            if (axios.isAxiosError(err) && err.response?.status === 401) {
-                setUser(null);
-                setError(null);
+            // A 401 means the session is already unauthenticated.
+            if (isAxiosError(err) && err.response?.status === 401) {
                 return;
             }
 
+            // Restore the session state if logout genuinely fails.
+            setUser(previousUser);
             setError('Logout failed. Please try again.');
             throw err;
         }
