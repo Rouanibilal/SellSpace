@@ -5,7 +5,9 @@ import { Inter } from 'next/font/google';
 import { AuthProvider } from '@/components/auth-provider';
 import { ThemeProvider } from '@/components/theme-provider';
 import { SiteSettingsProvider } from '@/components/site-settings-provider';
+import { getInitialUser } from '@/lib/auth-server';
 import { getSiteSettings, type SiteSettings } from '@/lib/settings';
+import type { User } from '@/lib/auth';
 
 import './globals.css';
 
@@ -51,6 +53,17 @@ export default async function RootLayout({children,}: LayoutProps<'/'>) {
         settings = defaultSettings;
     }
 
+    let initialUser: User | null | undefined;
+
+    try {
+        initialUser = await getInitialUser();
+    } catch (error) {
+        console.error('Failed to verify the initial user session:', error);
+
+        // Fall back to the existing browser-side session check.
+        initialUser = undefined;
+    }
+
     return (
         <html
             lang="en"
@@ -64,11 +77,9 @@ export default async function RootLayout({children,}: LayoutProps<'/'>) {
         </head>
 
         <body className="flex min-h-full flex-col font-sans">
-        <AuthProvider>
+        <AuthProvider initialUser={initialUser}>
             <ThemeProvider>
-                <SiteSettingsProvider
-                    initialSettings={settings}
-                >
+                <SiteSettingsProvider initialSettings={settings}>
                     {children}
                 </SiteSettingsProvider>
             </ThemeProvider>
