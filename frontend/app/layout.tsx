@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { connection } from 'next/server';
 import Script from 'next/script';
 import { Inter } from 'next/font/google';
 
@@ -44,7 +45,12 @@ const themeInitScript = `
   }
 `;
 
-export default async function RootLayout({children,}: LayoutProps<'/'>) {
+export default async function RootLayout({ children }: LayoutProps<'/'>) {
+    // The layout reads cookies, so every route renders per request.
+    // Declaring that here keeps Next's dynamic-rendering signal out of the
+    // try/catch blocks below.
+    await connection();
+
     let settings: SiteSettings;
     try {
         settings = await getSiteSettings();
